@@ -159,8 +159,13 @@
                     <button class="btn btn-outline-light me-2" type="button" id="searchButton">
                         <i class="fas fa-search"></i>
                     </button> 
-                    <partial name="_LoginPartial" />
                 </form>
+                @* _LoginPartial renders the Logout POST form, so it must be a
+                   SIBLING of this search form. Nested <form> elements are
+                   invalid HTML: the parser discards the inner start tag, which
+                   turned the Logout button into a submit for this search form
+                   (no action/method) and made logout silently do nothing. *@
+                <partial name="_LoginPartial" />
             </div>
         </div>
     </nav>

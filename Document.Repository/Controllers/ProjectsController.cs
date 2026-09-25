@@ -68,6 +68,7 @@ namespace Document.Repository.Controllers
             var projectsQuery = _context.Projects
                 .Include(p => p.Student)
                 .Include(p => p.Tags)
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))

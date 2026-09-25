@@ -43,6 +43,7 @@ namespace Document.Repository.Controllers
                 .Include(s => s.Programme)
                     .ThenInclude(d => d.Department)
                         .ThenInclude(c => c.College)
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))

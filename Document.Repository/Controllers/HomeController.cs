@@ -23,6 +23,7 @@ namespace Document.Repository.Controllers
         public async Task<IActionResult> Notice()
         {
             var allNotices = await _context.Notice
+                .AsNoTracking()
                 .OrderByDescending(n => n.Date) // Optional: Sort by latest date
                 .ToListAsync();
 
@@ -30,15 +31,24 @@ namespace Document.Repository.Controllers
         }
         public async Task<IActionResult> Index(int tablePageIndex = 1, int projectsPageIndex = 1, bool isAjaxRequest = false, string section = "")
         {
-            // Fetch total count of approved projects for table
-            var totalTableProjects = await _context.Projects
+            // Both grids page over the same filtered set, so this was counted
+            // twice with a byte-identical query. Count once.
+            var totalApprovedProjects = await _context.Projects
+                .AsNoTracking()
                 .Where(p => p.Status == ProjectStatus.Approved)
                 .CountAsync();
 
-            var totalTablePages = (int)Math.Ceiling(totalTableProjects / (double)TablePageSize);
+            var totalTablePages = (int)Math.Ceiling(totalApprovedProjects / (double)TablePageSize);
+            var totalProjectsPages = (int)Math.Ceiling(totalApprovedProjects / (double)ProjectsPageSize);
 
-            // Fetch paginated approved projects for the table, sorted by CreatedDate descending
-            var tableProjects = await _context.Projects
+            // Pass pagination info to ViewBag
+            ViewBag.TableCurrentPage = tablePageIndex;
+            ViewBag.TableTotalPages = totalTablePages;
+            ViewBag.ProjectsCurrentPage = projectsPageIndex;
+            ViewBag.ProjectsTotalPages = totalProjectsPages;
+
+            async Task<List<Project>> GetTableProjectsAsync() => await _context.Projects
+                .AsNoTracking()
                 .Where(p => p.Status == ProjectStatus.Approved)
                 .OrderByDescending(p => p.CreatedDate) // Sort by CreatedDate descending
                 .Include(p => p.Student)
@@ -47,15 +57,8 @@ namespace Document.Repository.Controllers
                 .Take(TablePageSize)
                 .ToListAsync();
 
-            // Fetch total count of approved projects for recent submissions
-            var totalProjects = await _context.Projects
-                .Where(p => p.Status == ProjectStatus.Approved)
-                .CountAsync();
-
-            var totalProjectsPages = (int)Math.Ceiling(totalProjects / (double)ProjectsPageSize);
-
-            // Fetch paginated approved projects for recent submissions, sorted by CreatedDate descending
-            var projects = await _context.Projects
+            async Task<List<Project>> GetProjectsAsync() => await _context.Projects
+                .AsNoTracking()
                 .Where(p => p.Status == ProjectStatus.Approved)
                 .OrderByDescending(p => p.CreatedDate) // Sort by CreatedDate descending
                 .Include(p => p.Documents)
@@ -65,21 +68,43 @@ namespace Document.Repository.Controllers
                 .Take(ProjectsPageSize)
                 .ToListAsync();
 
-            // Pass pagination info to ViewBag
-            ViewBag.TableCurrentPage = tablePageIndex;
-            ViewBag.TableTotalPages = totalTablePages;
-            ViewBag.ProjectsCurrentPage = projectsPageIndex;
-            ViewBag.ProjectsTotalPages = totalProjectsPages;
+            // A pager click only needs the section being redrawn. This check used
+            // to sit *below* the query block, so every page change fetched the
+            // slider, the notice and both project grids and then discarded them.
+            if (isAjaxRequest)
+            {
+                if (section == "tableProjects")
+                {
+                    return PartialView("_TableProjectsPartial", new HomeViewModel
+                    {
+                        TableProjects = await GetTableProjectsAsync()
+                    });
+                }
+                else if (section == "projects")
+                {
+                    // Pass only the projects to the partial view
+                    return PartialView("_ProjectsPartial", await GetProjectsAsync());
+                }
+            }
+
+            // Fetch paginated approved projects for the table, sorted by CreatedDate descending
+            var tableProjects = await GetTableProjectsAsync();
+
+            // Fetch paginated approved projects for recent submissions, sorted by CreatedDate descending
+            var projects = await GetProjectsAsync();
 
             // Get latest notice
             var latestNotice = await _context.Notice
+                .AsNoTracking()
                 .OrderByDescending(n => n.Id)
                 .FirstOrDefaultAsync();
 
             ViewBag.Notice = latestNotice;
 
             // Get slider images
-            var sliderImages = await _context.SliderImage.ToListAsync();
+            var sliderImages = await _context.SliderImage
+                .AsNoTracking()
+                .ToListAsync();
 
             // Prepare ViewModel
             var viewModel = new HomeViewModel
@@ -89,20 +114,6 @@ namespace Document.Repository.Controllers
                 SliderImages = sliderImages
             };
 
-            // Check if the request is an AJAX request
-            if (isAjaxRequest)
-            {
-                if (section == "tableProjects")
-                {
-                    return PartialView("_TableProjectsPartial", viewModel);
-                }
-                else if (section == "projects")
-                {
-                    // Pass only the projects to the partial view
-                    return PartialView("_ProjectsPartial", projects);
-                }
-            }
-
             return View(viewModel);
         }
 
@@ -111,6 +122,7 @@ namespace Document.Repository.Controllers
         {
             // Fetch all tag categories with their associated tags
             var tagCategories = await _context.TagCategories
+                .AsNoTracking()
                 .Include(tc => tc.Tags)
                 .ToListAsync();
 
@@ -119,6 +131,7 @@ namespace Document.Repository.Controllers
             if (tagId.HasValue)
             {
                 projects = await _context.Projects
+                    .AsNoTracking()
                     .Where(p => p.Status == ProjectStatus.Approved && p.Tags.Any(t => t.Id == tagId.Value))
                     .Include(p => p.Student)
                     .Include(p => p.Documents)
@@ -162,6 +175,7 @@ namespace Document.Repository.Controllers
 
             // Fetch only APPROVED projects - security check
             var project = await _context.Projects
+                .AsNoTracking()
                 .Where(p => p.Id == id && p.Status == ProjectStatus.Approved)
                 .Include(p => p.Documents)
                 .Include(p => p.Tags)
@@ -203,6 +217,7 @@ namespace Document.Repository.Controllers
 
             // Use parameterized query through EF Core (safe from SQL injection)
             var results = await _context.Projects
+                .AsNoTracking()
                 .Where(p => p.Status == ProjectStatus.Approved &&
                     (p.Title.ToLower().Contains(lowerQuery) ||
                      p.Abstract.ToLower().Contains(lowerQuery) ||

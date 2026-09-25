@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Document.Repository-8f739535-d340-49a3-b03f-def918eb3c16</UserSecretsId>
 	  <NoWarn>CS8602;IDE0291;CA1860</NoWarn>
+	  <CompressDuringPublish>true</CompressDuringPublish>
+	  <EnableCompressionInPublish>true</EnableCompressionInPublish>
   </PropertyGroup>
 
   <ItemGroup>

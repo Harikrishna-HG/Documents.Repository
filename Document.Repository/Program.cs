@@ -3,10 +3,12 @@ using Document.Repository.Services;
 using Document.Repository.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,7 +88,6 @@ builder.Services.AddResponseCompression(options =>
 
 // Add memory cache for performance
 builder.Services.AddMemoryCache();
-builder.Services.AddResponseCaching();
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews(options =>
@@ -104,13 +105,29 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
+// Rate limiting, per client IP. Replaces a hand-rolled middleware that
+// full-scanned its tracking dictionary on every request. The old limit of
+// 100/min was only ever calibrated against a counter that also counted
+// every CSS/JS/font request, so 100 requests was really ~9 page views.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("per-ip", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 300,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
 var app = builder.Build();
 
 // Use forwarded headers for reverse proxy
 app.UseForwardedHeaders();
-
-// Add rate limiting
-app.UseMiddleware<RateLimitingMiddleware>();
 
 // Add global exception handler
 app.UseMiddleware<GlobalExceptionHandler>();
@@ -140,7 +157,11 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.UseStaticFiles();
+// NOTE: no UseStaticFiles() here on purpose. It ran before
+// UseResponseCompression(), so all 2.79MB of wwwroot/lib shipped
+// uncompressed AND it short-circuited MapStaticAssets() further
+// down, making the fingerprinted/compressed asset pipeline dead
+// code. MapStaticAssets() now serves wwwroot instead.
 
 // Seeding Roles
 using (var scope = app.Services.CreateScope())
@@ -171,37 +192,46 @@ else
 
 app.UseHttpsRedirection();
 app.UseResponseCompression();
-app.UseResponseCaching();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.UseRateLimiter();
+
+// Static assets are fingerprinted and served straight from the build
+// output, so they are excluded from the per-IP budget - otherwise a
+// single page view spends 6-7 of the 300 permitted requests on CSS,
+// JS and fonts.
+app.MapStaticAssets().DisableRateLimiting();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    .WithStaticAssets()
+    .RequireRateLimiting("per-ip");
 
 app.MapControllerRoute(
     name: "Profile",
     pattern: "{controller=Admin}/{action=Profile}")
-    .WithStaticAssets();
+    .WithStaticAssets()
+    .RequireRateLimiting("per-ip");
 
 app.MapControllerRoute(
     name: "Listing",
     pattern: "{controller=Home}/{action=Listing}")
-    .WithStaticAssets();
+    .WithStaticAssets()
+    .RequireRateLimiting("per-ip");
 
 app.MapControllerRoute(
     name: "Notice",
     pattern: "{controller=Home}/{action=Notice}")
-    .WithStaticAssets();
+    .WithStaticAssets()
+    .RequireRateLimiting("per-ip");
 
 
 
 
-app.MapRazorPages();
+app.MapRazorPages().RequireRateLimiting("per-ip");
 
 app.Run();

@@ -155,16 +155,15 @@
 
 
                 </ul>
-                <form class="d-flex" role="search">
-                    <button class="btn btn-outline-light me-2" type="button" id="searchButton">
-                        <i class="fas fa-search"></i>
-                    </button> 
-                </form>
-                @* _LoginPartial renders the Logout POST form, so it must be a
-                   SIBLING of this search form. Nested <form> elements are
-                   invalid HTML: the parser discards the inner start tag, which
-                   turned the Logout button into a submit for this search form
-                   (no action/method) and made logout silently do nothing. *@
+                <button class="btn-search-trigger me-2" type="button" id="searchButton" aria-label="Search projects">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span>Search</span>
+                    <kbd class="btn-search-kbd" id="searchShortcutHint">Ctrl K</kbd>
+                </button>
+                @* _LoginPartial renders a Logout POST form, so it must stay a
+                   SIBLING here - never wrap it in another <form>. Nested forms
+                   are invalid HTML and the parser discards the inner start tag,
+                   which silently turned Logout into a submit for the outer form. *@
                 <partial name="_LoginPartial" />
             </div>
         </div>
@@ -292,11 +291,27 @@
             const searchInput = document.getElementById('searchInput');
             const searchResults = document.getElementById('searchResults');
 
-            searchButton.addEventListener('click', function () {
+            const openSearch = function () {
                 searchOverlay.style.display = 'block';
                 searchInput.focus();
                 searchResults.innerHTML = '';
+            };
+
+            searchButton.addEventListener('click', openSearch);
+
+            // Ctrl+K (Cmd+K on macOS) opens the same overlay. preventDefault
+            // suppresses the browser's own Ctrl+K / Cmd+K address-bar shortcut.
+            document.addEventListener('keydown', function (e) {
+                if (e.key.toLowerCase() !== 'k' || !(e.ctrlKey || e.metaKey)) return;
+                e.preventDefault();
+                if (searchOverlay.style.display !== 'block') openSearch();
             });
+
+            // Show the platform's own modifier in the hint.
+            const shortcutHint = document.getElementById('searchShortcutHint');
+            if (shortcutHint && /Mac|iPhone|iPad|iPod/.test(navigator.platform)) {
+                shortcutHint.textContent = '\u2318 K';
+            }
 
             closeSearch.addEventListener('click', function () {
                 searchOverlay.style.display = 'none';

@@ -5,6 +5,51 @@
 }
 
 
+/* Search trigger: a pill that reads as an input and advertises its
+   Ctrl+K shortcut, rather than a bare icon. */
+.btn-search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.85rem;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    white-space: nowrap;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-search-trigger:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.7);
+    color: #fff;
+}
+
+.btn-search-trigger:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+.btn-search-kbd {
+    padding: 0.1rem 0.4rem;
+    font-family: var(--bs-font-sans-serif);
+    font-size: var(--fs-2xs);
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+}
+
+/* The shortcut means nothing on a touch device. */
+@media (max-width: 575.98px) {
+    .btn-search-kbd {
+        display: none;
+    }
+}
+
 /* Search Overlay Styles */
 .search-overlay {
     position: fixed;

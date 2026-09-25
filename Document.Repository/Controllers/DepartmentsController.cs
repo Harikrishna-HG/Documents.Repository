@@ -57,6 +57,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Details,Head,Extension,CollegeId")] Department department)
         {
             if (department.CollegeId == Guid.Empty || !_context.Colleges.Any(c => c.Id == department.CollegeId))
@@ -152,6 +153,7 @@ namespace Document.Repository.Controllers
         // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var department = await _context.Departments.FindAsync(id);

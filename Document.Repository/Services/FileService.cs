@@ -105,7 +105,32 @@
 
         public void DeleteFile(string filePath)
         {
-            string fullPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath);
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return;
+            }
+
+            if (Path.IsPathRooted(filePath))
+            {
+                throw new ArgumentException("Invalid file path.");
+            }
+
+            string root = Path.GetFullPath(_webHostEnvironment.WebRootPath);
+            string fullPath;
+
+            try
+            {
+                fullPath = Path.GetFullPath(Path.Combine(root, filePath));
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                throw new ArgumentException("Invalid file path.", ex);
+            }
+
+            if (!fullPath.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Invalid file path.");
+            }
 
             if (File.Exists(fullPath))
             {

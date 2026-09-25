@@ -96,7 +96,8 @@ namespace Document.Repository.Areas.Identity.Pages.Account
 
                         if (roles == null || !roles.Any())
                         {
-                            return RedirectToAction("Create", "Students");
+                            // No role means no access anywhere. User/Index will Forbid, which is the honest outcome.
+                            return RedirectToAction("Index", "User");
                         }
 
                         if (roles.Contains("CollegeAdmin"))
@@ -132,8 +133,9 @@ namespace Document.Repository.Areas.Identity.Pages.Account
                         }
                     }
 
-                    // Fallback if user is null or unexpected state
-                    return RedirectToAction("Create", "Students");
+                    // Fallback if user is null or unexpected state.
+                    // Must not point at Students/Create, which is [Authorize(Roles = "Student")] only.
+                    return RedirectToAction("Index", "User");
                 }
 
                 if (result.RequiresTwoFactor)

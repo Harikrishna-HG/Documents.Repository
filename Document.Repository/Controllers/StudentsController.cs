@@ -10,8 +10,10 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Design;
 using Document.Repository.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Document.Repository.Models.Entities;
+using Document.Repository.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Document.Repository.Controllers
 {
@@ -19,11 +21,13 @@ namespace Document.Repository.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public StudentsController(ApplicationDbContext context, IFileService fileService)
+        public StudentsController(ApplicationDbContext context, IFileService fileService, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _fileService = fileService;
+            _userManager = userManager;
         }
 
         // GET: Students
@@ -172,6 +176,133 @@ namespace Document.Repository.Controllers
             return View(student);
         }
 
+        // GET: Students/CreateForUser
+        // Admin flow: creates a student login account AND its profile in one step.
+        // Deliberately separate from Create above, which is student self-registration and
+        // always assigns the profile to whoever is currently signed in.
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
+        public IActionResult CreateForUser()
+        {
+            ViewData["CollegeId"] = new SelectList(_context.Colleges, "Id", "Name");
+            ViewData["ProgrammeId"] = new SelectList(_context.Programmes, "Id", "Name");
+            return View();
+        }
+
+        // POST: Students/CreateForUser
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
+        public async Task<IActionResult> CreateForUser(CreateStudentAccountViewModel model)
+        {
+            // Validate everything before creating anything. Creating the account first and
+            // discovering a problem afterwards would strand a half-registered login.
+            if (model.ProgrammeId == 0 || !_context.Programmes.Any(p => p.Id == model.ProgrammeId))
+            {
+                ModelState.AddModelError(nameof(model.ProgrammeId), "Please select a valid Program.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Email))
+            {
+                var normalisedEmail = model.Email.Trim();
+                var existingUser = await _userManager.FindByEmailAsync(normalisedEmail);
+
+                if (existingUser != null)
+                {
+                    var hasProfile = await _context.Students.AnyAsync(s => s.UserId == existingUser.Id);
+                    ModelState.AddModelError(nameof(model.Email), hasProfile
+                        ? "That email already has a student profile."
+                        : "An account with that email already exists.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return RedisplayCreateForUser(model);
+            }
+
+            var user = new ApplicationUser { UserName = model.Email.Trim(), Email = model.Email.Trim() };
+            var createResult = await _userManager.CreateAsync(user, model.Password);
+
+            if (!createResult.Succeeded)
+            {
+                foreach (var error in createResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return RedisplayCreateForUser(model);
+            }
+
+            // The new account must be able to sign in and reach its own profile.
+            var roleResult = await _userManager.AddToRoleAsync(user, "Student");
+            if (!roleResult.Succeeded)
+            {
+                foreach (var error in roleResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                await _userManager.DeleteAsync(user);
+                return RedisplayCreateForUser(model);
+            }
+
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png" };
+            string? profilePic = null;
+
+            if (model.ProfilePicFile != null)
+            {
+                try
+                {
+                    profilePic = await _fileService.SaveFileAsync(model.ProfilePicFile, "images/user", allowedExtensions);
+                }
+                catch (ArgumentException ex)
+                {
+                    ModelState.AddModelError(nameof(model.ProfilePicFile), ex.Message);
+                    await _userManager.DeleteAsync(user);
+                    return RedisplayCreateForUser(model);
+                }
+            }
+
+            var newStudent = new Student
+            {
+                Name = model.Name,
+                RegistrationNumber = model.RegistrationNumber,
+                Semester = model.Semester,
+                ProgrammeId = model.ProgrammeId,
+                ProfilePic = profilePic,
+                UserId = user.Id
+            };
+
+            _context.Students.Add(newStudent);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Do not leave the account behind if the profile could not be stored.
+                if (profilePic != null)
+                {
+                    _fileService.DeleteFile(profilePic);
+                }
+
+                await _userManager.DeleteAsync(user);
+                throw;
+            }
+
+            TempData["SuccessMessage"] = $"Student account '{user.Email}' has been created successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private IActionResult RedisplayCreateForUser(CreateStudentAccountViewModel model)
+        {
+            ViewData["CollegeId"] = new SelectList(_context.Colleges, "Id", "Name");
+            ViewData["ProgrammeId"] = new SelectList(_context.Programmes, "Id", "Name", model.ProgrammeId);
+            TempData["ErrorMessage"] = "Failed to add the student. Please check the form and try again.";
+            return View(model);
+        }
+
 
         // GET: Students/Edit/5
         [Authorize(Roles = "Student")]
@@ -207,7 +338,7 @@ namespace Document.Repository.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Student")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,RegistrationNumber,ProfilePic,Semester,ProgrammeId,ProfilePicFile")] Student student)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,RegistrationNumber,Semester,ProgrammeId,ProfilePicFile")] Student student)
         {
             if (id != student.Id)
             {
@@ -222,6 +353,8 @@ namespace Document.Repository.Controllers
             {
                 return Forbid(); // Prevent users from editing other students' profiles
             }
+
+            student.ProfilePic = existingStudent.ProfilePic;
 
             if (student.ProgrammeId == 0 || !_context.Programmes.Any(c => c.Id == student.ProgrammeId))
             {
@@ -239,19 +372,20 @@ namespace Document.Repository.Controllers
                 try
                 {
                     string[] allowedExtensions = { ".jpg", ".jpeg", ".png" };
+                    var previousProfilePic = existingStudent.ProfilePic;
 
                     if (student.ProfilePicFile != null)
                     {
                         try
                         {
                             // Delete the old file if a new one is uploaded
-                            if (!string.IsNullOrEmpty(student.ProfilePic))
+                            if (!string.IsNullOrEmpty(previousProfilePic))
                             {
-                                _fileService.DeleteFile(student.ProfilePic);
+                                _fileService.DeleteFile(previousProfilePic);
                             }
 
                             // Save the new file
-                            student.ProfilePic = await _fileService.SaveFileAsync(student.ProfilePicFile, "images/user", allowedExtensions);
+                            existingStudent.ProfilePic = await _fileService.SaveFileAsync(student.ProfilePicFile, "images/user", allowedExtensions);
                         }
                         catch (ArgumentException ex)
                         {
@@ -264,12 +398,12 @@ namespace Document.Repository.Controllers
                             return View(student);
                         }
                     }
-                    else if (string.IsNullOrEmpty(student.ProfilePic))
-                    {
-                        student.ProfilePic = _context.Students.AsNoTracking().FirstOrDefault(s => s.Id == student.Id)?.ProfilePic;
-                    }
 
-                    _context.Update(student);
+                    existingStudent.Name = student.Name;
+                    existingStudent.RegistrationNumber = student.RegistrationNumber;
+                    existingStudent.Semester = student.Semester;
+                    existingStudent.ProgrammeId = student.ProgrammeId;
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -318,6 +452,7 @@ namespace Document.Repository.Controllers
         // POST: Students/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var student = await _context.Students.FindAsync(id);

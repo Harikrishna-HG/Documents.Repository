@@ -15,11 +15,13 @@ namespace Document.Repository.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
+        private readonly ILogger<SliderImagesController> _logger;
 
-        public SliderImagesController(ApplicationDbContext context, IFileService fileService)
+        public SliderImagesController(ApplicationDbContext context, IFileService fileService, ILogger<SliderImagesController> logger)
         {
             _context = context;
             _fileService = fileService;
+            _logger = logger;
         }
 
         // GET: SliderImages
@@ -195,7 +197,14 @@ namespace Document.Repository.Controllers
             {
                 if (!string.IsNullOrEmpty(sliderImage.ImageUpload))
                 {
-                    _fileService.DeleteFile(sliderImage.ImageUpload);
+                    try
+                    {
+                        _fileService.DeleteFile(sliderImage.ImageUpload);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        _logger.LogWarning(ex, "Skipped deleting out-of-bounds slider image path {FilePath}.", sliderImage.ImageUpload);
+                    }
                 }
                 _context.SliderImage.Remove(sliderImage);
             }

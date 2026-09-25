@@ -42,8 +42,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
     // User settings
     options.User.RequireUniqueEmail = true;
-    options.SignIn.RequireConfirmedAccount = true;
-    options.SignIn.RequireConfirmedEmail = true;
+
+    // In Development, IEmailSender is a no-op, so requiring confirmation would leave
+    // every newly registered account unable to ever sign in.
+    options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment();
+    options.SignIn.RequireConfirmedEmail = !builder.Environment.IsDevelopment();
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders()

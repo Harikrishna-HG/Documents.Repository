@@ -74,6 +74,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Details,DepartmentId")] Programme programme)
         {
             if (programme.DepartmentId == 0 || !_context.Departments.Any(c => c.Id == programme.DepartmentId))
@@ -120,6 +121,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Details,DepartmentId")] Programme programme)
         {
             if (programme.DepartmentId == 0 || !_context.Departments.Any(c => c.Id == programme.DepartmentId))
@@ -192,6 +194,7 @@ namespace Document.Repository.Controllers
         // POST: Programmes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,CollegeAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var programme = await _context.Programmes.FindAsync(id);

@@ -58,6 +58,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,SuperAdmin,CollegeAdmin")]
         public async Task<IActionResult> Create([Bind("Id,Label,Description")] TagCategory tagCategory)
         {
             if (ModelState.IsValid)
@@ -91,6 +92,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,SuperAdmin,CollegeAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Label,Description")] TagCategory tagCategory)
         {
             if (id != tagCategory.Id)
@@ -143,6 +145,7 @@ namespace Document.Repository.Controllers
         // POST: TagCategories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,SuperAdmin,CollegeAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var tagCategory = await _context.TagCategories.FindAsync(id);

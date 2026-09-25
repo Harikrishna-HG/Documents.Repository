@@ -443,11 +443,30 @@ namespace Document.Repository.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project != null)
+            var project = await _context.Projects
+                .Include(p => p.Student)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null)
             {
-                _context.Projects.Remove(project);
+                return NotFound();
             }
+
+            if (User.IsInRole("Student"))
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var studentId = await _context.Students
+                    .Where(s => s.UserId == currentUserId)
+                    .Select(s => s.Id)
+                    .FirstOrDefaultAsync();
+
+                if (project.StudentId != studentId)
+                {
+                    return Forbid();
+                }
+            }
+
+            _context.Projects.Remove(project);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

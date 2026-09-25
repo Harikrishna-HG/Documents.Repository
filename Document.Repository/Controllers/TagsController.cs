@@ -101,6 +101,7 @@ namespace Document.Repository.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,SuperAdmin,CollegeAdmin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,TagCategoryId")] Tag tag)
         {
             if (tag.TagCategoryId == 0 || !_context.TagCategories.Any(c => c.Id == tag.TagCategoryId))
@@ -159,6 +160,7 @@ namespace Document.Repository.Controllers
         // POST: Tags/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,SuperAdmin,CollegeAdmin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var tag = await _context.Tags.FindAsync(id);

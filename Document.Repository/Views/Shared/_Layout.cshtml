@@ -245,9 +245,48 @@
     }
 
 
+    <!-- PDF Viewer Modal -->
+    <!-- Lives in the layout, not in a page: the project cards in the search
+         overlay above are rendered on every page but pointed at #pdfModal,
+         which only existed on the home page, so "View PDF" did nothing
+         anywhere else. -->
+    <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfModalLabel">PDF Viewer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="modalPdfViewer"
+                            title="PDF Viewer"
+                            style="border: none; width: 100%; height: 80vh;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="~/lib/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 
         <script>
+            // Load the PDF into the modal iframe, and clear it on close so the
+            // browser is not holding a 20MB document alive behind the modal.
+            document.addEventListener('DOMContentLoaded', function () {
+                var pdfModal = document.getElementById('pdfModal');
+                var pdfIframe = document.getElementById('modalPdfViewer');
+
+                pdfModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    pdfIframe.src = button ? button.getAttribute('data-pdfpath') : '';
+                });
+
+                pdfModal.addEventListener('hidden.bs.modal', function () {
+                    pdfIframe.src = '';
+                });
+            });
+
             window.addEventListener('load', function () {
                 var hasNotice = @((ViewBag.Notice != null).ToString().ToLower());
                 if (hasNotice) {

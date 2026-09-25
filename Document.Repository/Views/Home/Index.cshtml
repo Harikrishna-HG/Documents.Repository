@@ -38,48 +38,12 @@
 </div>
 
 <div id="projectsSection">
-    @await Html.PartialAsync("_ProjectsPartial", Model.Projects)
-</div>
-
-<!-- Single Modal (Outside Loop) -->
-<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="pdfModalLabel">PDF Viewer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <iframe id="modalPdfViewer"
-                        title="PDF Viewer"
-                        style="border: none; width: 100%; height: 80vh;">
-                </iframe>
-            </div>
-        </div>
-    </div>
-</div>
+@await Html.PartialAsync("_ProjectsPartial", Model.Projects)
+}
 
 <script>
-    // JavaScript to Handle PDF Loading
-    document.addEventListener('DOMContentLoaded', function() {
-        var pdfModal = document.getElementById('pdfModal');
+    document.addEventListener('DOMContentLoaded', function () {
 
-        pdfModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var pdfPath = button.getAttribute('data-pdfpath');
-            var pdfIframe = document.getElementById('modalPdfViewer');
-            pdfIframe.src = pdfPath;
-        });
-
-        // Reset PDF source when modal closes
-        pdfModal.addEventListener('hidden.bs.modal', function () {
-            var pdfIframe = document.getElementById('modalPdfViewer');
-            pdfIframe.src = '';
-        });
-    });
-</script>
-<script>
-   document.addEventListener('DOMContentLoaded', function () {
     const projectsSection = document.getElementById('projectsSection');
 
     projectsSection.addEventListener('click', function (event) {

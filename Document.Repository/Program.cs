@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.FileProviders;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -136,7 +137,11 @@ app.UseMiddleware<GlobalExceptionHandler>();
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    // SAMEORIGIN, not DENY: the in-app PDF viewers (the #pdfModal iframe and
+    // the notice <embed>) frame our own PDFs. DENY - and frame-ancestors
+    // 'none' below - made the browser refuse to render them, so the modal
+    // opened blank. Same-origin framing still blocks clickjacking.
+    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
     context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
     context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
     context.Response.Headers.Add("Permissions-Policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()");
@@ -151,17 +156,18 @@ app.Use(async (context, next) =>
             "img-src 'self' data: https:; " +
             "font-src 'self' data:; " +
             "connect-src 'self'; " +
-            "frame-ancestors 'none';");
+            "frame-ancestors 'self';");
     }
     
     await next();
 });
 
-// NOTE: no UseStaticFiles() here on purpose. It ran before
-// UseResponseCompression(), so all 2.79MB of wwwroot/lib shipped
-// uncompressed AND it short-circuited MapStaticAssets() further
-// down, making the fingerprinted/compressed asset pipeline dead
-// code. MapStaticAssets() now serves wwwroot instead.
+// MapStaticAssets() serves from the build-time static assets manifest, not by
+// scanning the web root at runtime. Files written by FileService at upload time
+// have no manifest entry, so every newly uploaded PDF 404'd. Serve the four
+// runtime upload folders off disk instead - scoped to those folders so /lib,
+// /css and the fingerprinted assets still fall through to MapStaticAssets, and
+// registered after UseResponseCompression() so they stay compressed.
 
 // Seeding Roles
 using (var scope = app.Services.CreateScope())
@@ -192,6 +198,24 @@ else
 
 app.UseHttpsRedirection();
 app.UseResponseCompression();
+
+// Uploads, notices, slider images and user avatars. These are the only folders
+// written at runtime, and MapStaticAssets() knows nothing about them until the
+// next build. Placed before UseRouting() so a large PDF fetch short-circuits
+// ahead of the per-IP rate limit rather than spending a page view.
+foreach (var uploadFolder in new[] { "uploads", "notice", "SliderImages", "images/user" })
+{
+    var folderPath = Path.Combine(app.Environment.WebRootPath, uploadFolder);
+    if (Directory.Exists(folderPath))
+    {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(folderPath),
+            RequestPath = "/" + uploadFolder
+        });
+    }
+}
+
 app.UseRouting();
 
 app.UseAuthentication();

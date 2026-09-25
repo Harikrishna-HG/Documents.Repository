@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuGet.Packaging" Version="6.12.5" />
+    <PackageReference Include="NuGet.Protocol" Version="6.12.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\SliderImages\" />
     <Folder Include="wwwroot\notice\" />
     <Folder Include="wwwroot\uploads\thumbnails\" />

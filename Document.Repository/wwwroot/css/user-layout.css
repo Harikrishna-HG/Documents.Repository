@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --sidebar-width: 260px;
 }
 
@@ -131,7 +131,7 @@
         }
 
         .mobile-header .logo-container span {
-            font-size: 0.85rem;
+            font-size: var(--fs-xs);
             font-weight: 600;
             white-space: nowrap;
         }
@@ -140,7 +140,7 @@
     height: 100%;
 }
 
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
     .mobile-header {
         display: flex;
         justify-content: space-between;
@@ -206,7 +206,7 @@
         background-color: #0d6efd;
     }
 
-@@media (min-width: 769px) {
+@media (min-width: 769px) {
     .desktop-toggle {
         display: block;
     }
@@ -218,7 +218,7 @@
 }
 
     .header-container h2 {
-        font-size: 1.5rem;
+        font-size: var(--fs-xl);
         margin-left: 1rem;
     }
 /* Scroll to Top Button Styles */
@@ -251,7 +251,7 @@
         display: flex;
     }
 
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
     .scroll-to-top {
         bottom: 80px;
         right: 15px;
@@ -286,7 +286,7 @@
     border: none;
     border-radius: 25px;
     background: rgba(255, 255, 255, 0.95);
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: #333;
 }
 
@@ -309,7 +309,7 @@
     background: none;
     padding: 0;
     cursor: pointer;
-    font-size: 16px;
+    font-size: var(--fs-md);
 }
 
 .mobile-search-results {
@@ -334,7 +334,7 @@
 }
 
 .search-category-title {
-    font-size: 0.9rem;
+    font-size: var(--fs-2xs);
     font-weight: 600;
     color: #6c757d;
     margin-bottom: 0.5rem;
@@ -355,14 +355,14 @@
     }
 
 .search-item-title {
-    font-size: 0.95rem;
+    font-size: var(--fs-sm);
     font-weight: 500;
     color: #212529;
     margin-bottom: 0.25rem;
 }
 
 .search-item-meta {
-    font-size: 0.8rem;
+    font-size: var(--fs-2xs);
     color: #6c757d;
 }
 
@@ -394,10 +394,10 @@
     }
 
     .login-icon i {
-        font-size: 1.2rem;
+        font-size: var(--fs-lg);
     }
 
-@@media (max-width: 768px) {
+@media (max-width: 768px) {
     .mobile-header .login-icon {
         margin-left: 1rem;
     }

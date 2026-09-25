@@ -6,55 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="~/images/favicon.jpg" type="image/x-icon" />
     <title>User Dashboard - Farwestern University Central E-library</title>
-    <link rel="stylesheet" href="~/css/user-layout.css" />
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/lib/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-
-        /* Desktop Toggle Button */
-
-        @@media (min-width: 769px) {
-        .desktop-toggle{
-        display: block;
-        }
-
-        }
-
-        @@media (max-width: 768px) {
-        .mobile-header
-
-        {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        }
-
-        .main-content {
-        margin-left: 0;
-        padding-top: 70px;
-        width: 100%;
-        }
-
-        .sidebar {
-        margin-left: calc(-1 * var(--sidebar-width));
-        }
-
-        .sidebar.show {
-        margin-left: 0;
-        }
-
-        .stats-card {
-        margin-bottom: 1rem;
-        }
-
-        .table-responsive {
-        margin-bottom: 1rem;
-        }
-        }
-
-    </style>
+    <link rel="stylesheet" href="~/lib/font-awesome/6.7.2/css/all.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/responsive-type.css" />
+    <link rel="stylesheet" href="~/css/user-layout.css" />
+    <link rel="stylesheet" href="~/css/footer.css" />
 </head>
 <body>
     <!-- Scroll to Top Button -->
@@ -405,10 +365,8 @@
             updateLayout();
         });
     </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/3.6.0/jquery.min.js"></script>
 
     @RenderSection("Scripts", required: false)
 

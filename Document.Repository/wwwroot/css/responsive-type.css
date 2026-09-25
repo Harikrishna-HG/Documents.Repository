@@ -1,0 +1,49 @@
+/* ============================================================
+   Fluid type scale
+   ------------------------------------------------------------
+   The root font-size is fluid. Because every other size in this
+   app is expressed in rem, this one declaration makes the whole
+   UI scale together - including Bootstrap's own rem-based
+   components - instead of custom text and framework text
+   drifting apart at each breakpoint.
+
+   15px @ 360px  ->  ~16px @ 1024px  ->  17.5px @ 1600px+
+
+   Use the --fs-* tokens rather than raw rem so that the ratio
+   between custom text and Bootstrap components stays constant.
+   ============================================================ */
+
+html {
+    font-size: clamp(15px, 0.86rem + 0.2vw, 17.5px);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+:root {
+    /* Type scale. 2xs is the floor: never below ~12px, which was
+       the main cause of the 0.75rem text that looked out of
+       proportion on phones. */
+    --fs-2xs: 0.8rem;
+    --fs-xs: 0.85rem;
+    --fs-sm: 0.9rem;
+    --fs-md: 1rem;
+    --fs-lg: 1.125rem;
+    --fs-xl: 1.375rem;
+    --fs-2xl: clamp(1.5rem, 1.3rem + 0.9vw, 1.9rem);
+
+    /* Line height. Previously the project had exactly one, so
+       shrinking the font size made mobile text cramped. */
+    --lh-tight: 1.25;
+    --lh-snug: 1.4;
+    --lh-normal: 1.55;
+}
+
+body {
+    line-height: var(--lh-normal);
+}
+
+/* Let long words (emails, URLs, college names) wrap instead of
+   forcing a horizontal scrollbar on narrow screens. */
+h1, h2, h3, h4, h5, h6, p, td, th, label, .form-text, a, span, div {
+    overflow-wrap: break-word;
+}

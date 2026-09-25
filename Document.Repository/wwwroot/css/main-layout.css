@@ -35,7 +35,7 @@
 .search-input {
     width: 100%;
     padding: 10px 40px 10px 15px;
-    font-size: 1rem;
+    font-size: var(--fs-md);
     border: none;
     border-radius: 5px;
 }
@@ -58,7 +58,7 @@
     top: 20px;
     right: 20px;
     color: white;
-    font-size: 1.5rem;
+    font-size: var(--fs-xl);
     cursor: pointer;
 }
 
@@ -110,16 +110,15 @@
 .notice-title {
     color: #333;
     margin: 0 0 10px 0;
-    /* Default size for desktop */
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
 }
 
 .notice-description {
     color: #666;
     margin: 0 0 50px 0;
-    /* Default size for desktop */
-    font-size: 1rem;
-    line-height: 1.4;
+    font-size: var(--fs-md);
+    line-height: var(--lh-normal);
 }
 
 .notice-footer {
@@ -131,12 +130,14 @@
     left: 15px;
     right: 15px;
     flex-direction: row-reverse;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .notice-date {
     margin-top: 10px;
     color: #333;
-    font-size: 1rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     white-space: nowrap;
 }
@@ -152,8 +153,7 @@
     align-items: center;
     border: none;
     cursor: pointer;
-    /* Default size for desktop */
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
 }
 
     .download-btn:hover {
@@ -179,42 +179,21 @@
 .page-title {
     color: #1a237e;
     margin-bottom: 5px;
-    /* Default size for desktop */
-    font-size: 1.8rem;
+    font-size: var(--fs-2xl);
+    line-height: var(--lh-tight);
 }
 
 .subtitle {
     color: #666;
-    /* Default size for desktop */
-    font-size: 1.2rem;
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
 }
 
-/* Mobile styles */
+/* Layout-only adjustments. Font sizes are fluid via the --fs-*
+   tokens, so they are intentionally NOT overridden here. */
 @media (max-width: 768px) {
-    .notice-title {
-        font-size: 0.9rem;
-    }
-
     .notice-description {
-        font-size: 0.85rem;
         margin-bottom: 35px;
-    }
-
-    .notice-date {
-        font-size: 0.9rem;
-    }
-
-    .download-btn {
-        font-size: 0.8rem;
-        padding: 6px 12px;
-    }
-
-    .page-title {
-        font-size: 1.4rem;
-    }
-
-    .subtitle {
-        font-size: 0.9rem;
     }
 
     .notice-card {
@@ -227,6 +206,10 @@
         right: 12px;
     }
 
+    .download-btn {
+        padding: 6px 12px;
+    }
+
     .download-btn i {
         margin-right: 6px;
     }
@@ -234,30 +217,8 @@
 
 /* Small mobile devices */
 @media (max-width: 480px) {
-    .notice-title {
-        font-size: 0.85rem;
-    }
-
     .notice-description {
-        font-size: 0.8rem;
         margin-bottom: 30px;
-    }
-
-    .notice-date {
-        font-size: 0.85rem;
-    }
-
-    .download-btn {
-        font-size: 0.75rem;
-        padding: 5px 10px;
-    }
-
-    .page-title {
-        font-size: 1.2rem;
-    }
-
-    .subtitle {
-        font-size: 0.85rem;
     }
 
     .notice-card {
@@ -268,6 +229,10 @@
         bottom: 10px;
         left: 10px;
         right: 10px;
+    }
+
+    .download-btn {
+        padding: 5px 10px;
     }
 }
 

@@ -1,0 +1,40 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@using Document.Repository.ViewModels
+@model RoleAssignmentViewModel
+
+<h3>Assign Role to @Model.UserName</h3>
+
+<form asp-action="AssignRole" method="post">
+    <input type="hidden" asp-for="UserId" />
+
+    <div class="form-group">
+        <label for="SelectedRoles" >Select Role</label>
+        <select asp-for="SelectedRoles" class="form-control chosen-select" multiple data-placeholder="Select Roles">
+            @foreach (var role in Model.AvailableRoles)
+            {
+                <option value="@role" selected="@(Model.SelectedRoles.Contains(role) ? "selected" : null)">
+                    @role
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    <script>
+            $(document).ready(function() {
+            $(".chosen-select").chosen({
+            no_results_text: "Oops, no results found!",
+            width: "100%"
+            });
+        });
+    </script>
+}

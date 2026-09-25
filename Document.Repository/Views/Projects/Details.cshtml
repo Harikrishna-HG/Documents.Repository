@@ -1,0 +1,104 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.Project
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Project</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Abstract)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Abstract)
+        </dd>
+        <dt class = "col-sm-2">
+            Tags
+        </dt>
+        <dd class = "col-sm-10">
+            @if (Model.Tags != null && Model.Tags.Any())
+            {
+                <ul>
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <li>@tag.Name</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No tags assigned to this project.</p>
+            }
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Thumbnail)
+        </dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.Thumbnail))
+            {
+                <img src="/@Model.Thumbnail" alt="Thumbnail"
+                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;" />
+            }
+            else
+            {
+                <span>No Image Available</span>
+            }
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Student)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Student.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Documents
+        </dt>
+        
+        <dd class="col-sm-10">
+            @if (Model.Documents != null && Model.Documents.Any())
+            {
+                <ul>
+                    @foreach (var document in Model.Documents)
+                    {
+                        <li>
+                            <a href="/uploads/@document.FileName" target="_blank">@document.FileName</a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No documents available for this project.</p>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

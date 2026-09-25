@@ -1,0 +1,139 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.Project
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h3 class="text-center">Edit Project Details</h3>
+<hr />
+<div class="container mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4">
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-3">
+
+                        <!-- Title -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label fw-bolder">Title <span style="color: red">*</span></label>
+                                <input asp-for="Title" class="form-control" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Student Name -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="StudentId" class="form-label fw-bolder control-label">Students <span style="color: red">*</span></label>
+                                <select asp-for="StudentId" class="form-control" asp-items="ViewBag.StudentId">
+                                    <option disabled>-- Select Student --</option>
+                                </select>
+                                <span asp-validation-for="StudentId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Abstract" class="form-label fw-bolder">Abstract <span style="color: red">*</span></label>
+                                <textarea asp-for="Abstract" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Abstract" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="Tags" class="form-label fw-bolder">Tags <span style="color: red">*</span></label>
+                                <select id="Tags" class="chosen-select form-control" data-placeholder="Choose options..." name="Tags" multiple>
+                                    @foreach (var tag in ViewBag.Tags as SelectList)
+                                    {
+                                        if (Model.Tags != null && Model.Tags.Any(t => t.Id.ToString() == tag.Value))
+                                        {
+                                            <option value="@tag.Value" selected>@tag.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@tag.Value">@tag.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ThumbnailFile" class="form-label fw-bolder">Upload Thumbnail <span style="color: red">*</span></label>
+                                @if (!string.IsNullOrEmpty(Model.Thumbnail))
+                                {
+                                    <div class="mb-2">
+                                        <img src="/@Model.Thumbnail" alt="Thumbnail"
+                                             style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;" />
+                                    </div>
+                                }
+                                <input asp-for="ThumbnailFile" type="file" class="form-control" />
+                                <span asp-validation-for="ThumbnailFile" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Documents -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Documents" class="form-label fw-bolder">Upload Files <span style="color: red">*</span></label>
+                                @if (Model.Documents != null && Model.Documents.Any())
+                                {
+                                    <ul>
+                                        @foreach (var document in Model.Documents)
+                                        {
+                                            <li>
+                                                <a href="/uploads/@document.FileName" target="_blank">@document.FileName</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <p>No documents available for this project.</p>
+                                }
+                                <input asp-for="Documents" type="file" multiple class="form-control mt-2" />
+                                <span asp-validation-for="Documents" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button & Back to List Button -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    <script>
+            $(document).ready(function() {
+            $(".chosen-select").chosen({
+            no_results_text: "Oops, no results found!",
+            width: "100%"
+            });
+        });
+    </script>
+}

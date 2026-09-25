@@ -1,0 +1,43 @@
+﻿@model Document.Repository.Models.Entities.Notice
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "_UserLayout";
+}
+
+<h1 class="text-center">Notice Details</h1>
+<hr />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Title)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Title)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Date)</dt>
+                <dd class="col-sm-9">@Model.Date.ToString("yyyy-MM-dd")</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FilePath)</dt>
+                <dd class="col-sm-9">
+                    @if (!string.IsNullOrEmpty(Model.FilePath))
+                    {
+                        <a href="@Url.Content("~/notice/" + System.IO.Path.GetFileName(Model.FilePath))" target="_blank">
+                            @System.IO.Path.GetFileName(Model.FilePath)
+                        </a>
+                    }
+                    else
+                    {
+                        <span>No File Available</span>
+                    }
+                </dd>
+            </dl>
+            <div class="d-flex justify-content-center mt-4">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary me-2">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

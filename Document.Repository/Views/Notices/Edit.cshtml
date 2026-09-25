@@ -1,0 +1,90 @@
+﻿@model Document.Repository.Models.Entities.Notice
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "_UserLayout"; 
+}
+
+<h3 class="text-center">Edit Notice</h3>
+<hr />
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4 rounded">
+
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-3">
+                        <!-- Notice Title -->
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label fw-bolder">Notice Title <span style="color: red">*</span></label>
+                                <input asp-for="Title" class="form-control" placeholder="Enter Notice Title..." />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Description Field -->
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-bolder">Description</label>
+                                <textarea asp-for="Description" class="form-control" placeholder="Enter Notice Description..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="File" class="form-label fw-bolder">Notice Upload <span style="color: red">*</span></label>
+                                <input asp-for="File" type="file" class="form-control" />
+                                <span asp-validation-for="File" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Date Field -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Date" class="form-label fw-bolder">Notice Date <span style="color: red">*</span></label>
+                                <input asp-for="Date" type="date" class="form-control" />
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing File -->
+                    @if (!string.IsNullOrEmpty(Model.FilePath))
+                    {
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bolder">Current File</label>
+                                    <div>
+                                        <a href="@Url.Content("~/notice/" + System.IO.Path.GetFileName(Model.FilePath))" target="_blank">
+                                            @System.IO.Path.GetFileName(Model.FilePath)
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Submit & Back Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

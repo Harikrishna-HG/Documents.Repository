@@ -1,0 +1,63 @@
+﻿@model Document.Repository.Models.Entities.SliderImage
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "_UserLayout"; // Matching your college form layout
+}
+
+<h3 class="text-center">Create New Slider Image</h3>
+<hr />
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4 rounded">
+
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <!-- Slider Image Title -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label fw-bolder">Slider Image Title <span style="color: red">*</span></label>
+                                <input asp-for="Title" class="form-control" placeholder="Enter Slider Image Title..." />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Slider Image Description -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-bolder">Description</label>
+                                <input asp-for="Description" class="form-control" placeholder="Enter Description..." />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ImageFile" class="form-label fw-bolder">Image Upload <span style="color: red">*</span></label>
+                                <input asp-for="ImageFile" type="file" class="form-control" />
+                                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit & Back Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

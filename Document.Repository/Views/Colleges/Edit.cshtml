@@ -1,0 +1,87 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.College
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h3 class="text-center">Edit The College Detail</h3>
+<hr />
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4 rounded">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-3">
+                        <!-- College Name -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-bolder">College Name <span style="color: red">*</span></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Contact Number -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Contact" class="form-label fw-bolder">Contact Number <span style="color: red">*</span></label>
+                                <input asp-for="Contact" class="form-control" />
+                                <span asp-validation-for="Contact" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CampusChief" class="form-label fw-bolder">Campus Chief <span style="color: red">*</span></label>
+                                <input asp-for="CampusChief" class="form-control" />
+                                <span asp-validation-for="CampusChief" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Address" class="form-label fw-bolder">Address <span style="color: red">*</span></label>
+                                <input asp-for="Address" class="form-control" />
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                       
+                        <!-- College Details -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="details" class="form-label fw-bolder">Details</label>
+                                <textarea  asp-for="Details" class="form-control" rows="4" placeholder="Enter College Details..."></textarea>
+                                <span asp-validation-for="Details" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button & Back to List Button -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary " asp-action="Index">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+
+

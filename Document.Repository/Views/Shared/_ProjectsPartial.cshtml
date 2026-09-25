@@ -1,0 +1,139 @@
+﻿@model IEnumerable<Document.Repository.Models.Entities.Project>
+
+<style>
+    .project-card {
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .project-image {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .btn-group .btn {
+        padding: 0.375rem 0.75rem;
+    }
+
+    .project-abstract {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+</style>
+<!-- Recent Submissions -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-1 text-gray-800">Recent Submissions</h1>
+<div class="row g-3">
+        <p class="mb-4">
+            Your gateway to academic theses, journals, and digital resources. With advanced search tools and persistent identifiers, we ensure seamless access, integrity, and support for the FWUCL community's research and learning.
+            <a target="_blank" href="https://datatables.net">Official documentation</a>.
+        </p>
+    @foreach (var project in Model)
+    {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card project-card h-100">
+                    <img src="@project.Thumbnail" class="card-img-top project-image" alt="Project @project.Title">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="small text-success-emphasis">
+                                <i class="fas fa-tags me-1"></i>
+                                @if (project.Tags != null && project.Tags.Any())
+                                {
+                                    @string.Join(", ", project.Tags.Select(t => t.Name))
+                                }
+                                else
+                                {
+                                    <span>No Tags</span>
+                                }
+                            </span>
+                            <span class="small text-muted">
+                                <i class="fas fa-calendar me-1"></i> @project.CreatedDate.ToShortDateString()
+                            </span>
+                        </div>
+                        <h5 class="card-title">@project.Title</h5>
+                        <div class="mb-2 text-body-secondary small">
+                            <i class="fas fa-user me-1"></i>@project.Student?.Name
+                        </div>
+                        <p class="card-text project-abstract">
+                            @(project.Abstract.Length > 180 ? project.Abstract.Substring(0, 80) + "..." : project.Abstract)
+                        </p>
+
+                             
+                        @{
+                            var document = project.Documents?.FirstOrDefault();
+                        }
+                        @if (document != null)
+                        {
+                            <div class="project-buttons">
+                                <div class="d-flex justify-content-between w-100">
+                                    <div>
+                                        <a class="btn btn-sm btn-primary"
+                                           asp-controller="Home" asp-action="ReadMore" asp-route-id="@project.Id">
+                                            <i class="fas fa-book-open me-1"></i>Read More
+                                        </a>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#pdfModal"
+                                                data-pdfpath="/uploads/@document.FileName">
+                                            <i class="fas fa-eye me-1"></i>View PDF
+                                        </button>
+
+                                        <a href="/uploads/@document.FileName"
+                                           class="btn btn-sm btn-outline-success"
+                                           download>
+                                            <i class="fas fa-download me-1"></i>Download
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+    }
+</div>
+<!-- Pagination -->
+<nav aria-label="Projects pagination example">
+    <ul class="pagination justify-content-center mt-4">
+        <li class="page-item @(ViewBag.ProjectsCurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link project-pagination" href="#" data-page="@ViewBag.ProjectsCurrentPage - 1" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        @for (int i = 1; i <= ViewBag.ProjectsTotalPages; i++)
+        {
+            <li class="page-item @(ViewBag.ProjectsCurrentPage == i ? "active" : "")">
+                <a class="page-link project-pagination" href="#" data-page="@i">@i</a>
+            </li>
+        }
+        <li class="page-item @(ViewBag.ProjectsCurrentPage == ViewBag.ProjectsTotalPages ? "disabled" : "")">
+            <a class="page-link project-pagination" href="#" data-page="@ViewBag.ProjectsCurrentPage + 1" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</div>

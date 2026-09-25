@@ -1,0 +1,330 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.Project
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    #success-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Full viewport height */
+        background-color: rgba(0, 0, 0, 0.2); /* Optional semi-transparent background */
+        position: fixed; /* Ensure it stays in the center of the screen */
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1250; /* Higher than most elements */
+    }
+
+    .success-container {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 90%;
+    }
+
+    .success-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #072c82;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 2rem;
+        box-shadow: 0 4px 8px rgba(7, 44, 130, 0.3);
+    }
+
+        .success-icon i {
+            color: white;
+            font-size: 38px;
+        }
+
+    .success-title {
+        color: rgb(7, 44, 130);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .success-message {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-return {
+        background-color: rgb(7, 44, 130);
+        border-color: rgb(7, 44, 130);
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-return:hover {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            transform: translateY(-2px);
+        }
+
+    #error-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: rgba(0, 0, 0, 0.2);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1250;
+    }
+
+    .error-container {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        z-index: 1251;
+    }
+
+    .error-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 2rem;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+
+        .error-icon i {
+            color: white;
+            font-size: 38px;
+        }
+
+    .error-title {
+        color: #dc3545;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .error-details {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+        .error-details ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .error-details li {
+            margin-bottom: 0.5rem;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-right: 1rem;
+    }
+
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #bb2d3b;
+            transform: translateY(-2px);
+        }
+
+    .btn-outline-secondary {
+        padding: 0.75rem 2rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+    .chosen-container,
+    .chosen-container .chosen-choices,
+    select.chosen-select {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    @@media (max-width: 767px) {
+        .chosen-container, .chosen-container .chosen-choices, select.chosen-select
+
+    {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="success-wrapper">
+        <div class="success-container">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h4 class="success-title">@TempData["SuccessMessage"]</h4>
+            <p class="success-message">Your project has been successfully submitted to the Farwestern University Digital Repository.</p>
+            <a asp-action="Create" asp-controller="Projects" class="btn btn-primary btn-return">Return to Home</a>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="error-wrapper">
+        <div class="error-container">
+            <div class="error-icon">
+                <i class="fas fa-exclamation"></i>
+            </div>
+            <h2 class="error-title">Submission Failed</h2>
+            <p class="error-message">There were some issues with your project submission. Please review the errors below and try again.</p>
+
+            <div class="error-details">
+                <ul>
+                    <li>@TempData["ErrorMessage"]</li>
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <a asp-action="Create" asp-controller="Projects" class="btn btn-danger">Try Again</a>
+            </div>
+        </div>
+    </div>
+}
+
+<h3 class="text-center">Your Project Details</h3>
+<hr />
+<div class="container mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4">
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <div class="row g-3">
+
+                        <!-- Title -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label fw-bolder">Title <span style="color: red">*</span></label>
+                                <input asp-for="Title" class="form-control" placeholder="Enter project title..." />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Student Name -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="StudentId" class="form-label fw-bolder control-label">Author <span style="color: red">*</span></label>
+                                <select asp-for="StudentId" class="form-control" asp-items="ViewBag.StudentId">
+                                    <option selected disabled>-- Select Student --</option>
+                                </select>
+                                <span asp-validation-for="StudentId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Abstract -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label asp-for="Abstract" class="form-label fw-bolder">Abstract <span style="color: red">*</span></label>
+                                <textarea asp-for="Abstract" class="form-control" rows="4" placeholder="Enter project abstract..."></textarea>
+                                <span asp-validation-for="Abstract" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bolder">Tags <span style="color: red">*</span></label>
+                                <select class="chosen-select" multiple data-placeholder="Choose options..." asp-for="Tags">
+                                    @foreach (var tag in ViewBag.Tags)
+                                    {
+                                        <option value="@tag.Id">@tag.Name</option>
+                                    }
+                                </select>
+                                <span class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ThumbnailFile" class="form-label fw-bolder">Upload Thumbnail <span style="color: red">*</span></label>
+                                <input asp-for="ThumbnailFile" type="file" class="form-control" />
+                                <span asp-validation-for="ThumbnailFile" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Documents -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Documents" class="form-label fw-bolder">Upload Files <span style="color: red">*</span></label>
+                                <input asp-for="Documents" type="file" multiple class="form-control" />
+                                <span asp-validation-for="Documents" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Submit Button & Back to List Button -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+    <script>
+            $(document).ready(function() {
+            $(".chosen-select").chosen({
+            no_results_text: "Oops, no results found!",
+            width: "100%"
+            });
+        });
+    </script>
+
+}

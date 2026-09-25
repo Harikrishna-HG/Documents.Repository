@@ -1,0 +1,192 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.Student
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h3 class="text-center">Edit The Student Detail</h3>
+<hr />
+
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4 rounded" >
+
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-3">
+                        <!-- Name -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label fw-bolder">Name <span style="color: red">*</span></label>
+                                <input asp-for="Name" class="form-control" placeholder="Enter Your Name..." />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- RegistrationNumber -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="RegistrationNumber" class="form-label fw-bolder">Registration Number <span style="color: red">*</span></label>
+                                <input asp-for="RegistrationNumber" class="form-control" placeholder="Enter Your Registration Number..." />
+                                <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture Upload -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ProfilePicFile" class="form-label fw-bolder">Profile Picture <span style="color: red">*</span></label>
+                                <div>
+                                    @if (!string.IsNullOrEmpty(Model.ProfilePic))
+                                    {
+                                        <img src="/@Model.ProfilePic" alt="Current Profile Picture" width="50" height="50" />
+                                    }
+                                    else
+                                    {
+                                        <p>No Profile Picture</p>
+                                    }
+                                </div>
+                                <input type="file" asp-for="ProfilePicFile" class="form-control" />
+                                <span asp-validation-for="ProfilePicFile" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Semester Selection -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Semester" class="form-label fw-bolder">Semester <span style="color: red">*</span></label>
+                                <select asp-for="Semester" class="form-control">
+                                    <option value="">-- Select Semester --</option>
+                                    <option value="First">First</option>
+                                    <option value="Second">Second</option>
+                                    <option value="Third">Third</option>
+                                    <option value="Fourth">Fourth</option>
+                                    <option value="Fifth">Fifth</option>
+                                    <option value="Sixth">Sixth</option>
+                                    <option value="Seventh">Seventh</option>
+                                    <option value="Eighth">Eighth</option>
+                                </select>
+                                <span asp-validation-for="Semester" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- College Selection -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bolder">College <span style="color: red">*</span></label>
+                                <select id="CollegeId" name="CollegeId" class="form-control">
+                                    <option disabled>-- Select College --</option>
+                                    @foreach (var college in ViewBag.CollegeId as SelectList)
+                                    {
+                                        @if (Model?.Programme?.Department?.CollegeId != null && college.Value == Model.Programme.Department.CollegeId.ToString())
+                                        {
+                                            <option value="@college.Value" selected>@college.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@college.Value">@college.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Department Selection -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bolder">Department <span style="color: red">*</span></label>
+                                <select class="form-control" id="DepartmentId" asp-items="ViewBag.SiblingDepartments">
+                                    <option disabled>-- Select Department --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Program Selection -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ProgrammeId" class="form-label fw-bolder">Program <span style="color: red">*</span></label>
+                                <select asp-for="ProgrammeId" id="ProgrammeId" class="form-control" asp-items="ViewBag.SiblingProgrammes">
+                                    <option disabled>-- Select Program --</option>
+                                </select>
+                                <span asp-validation-for="ProgrammeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button & Cancel Button -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-primary flex-fill me-2" style="width: 50%;">Save</button>
+                        <a asp-action="Index" class="btn btn-warning flex-fill ms-3" style="width: 50%;">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#CollegeId').change(function () {
+                var collegeId = $(this).val();
+                var departmentDropdown = $('#DepartmentId');
+                departmentDropdown.empty();
+                departmentDropdown.append('<option disabled selected>-- Select Department --</option>');
+
+                if (collegeId) {
+                    $.ajax({
+                        url: '@Url.Action("GetDepartmentsByCollege", "Students")',
+                        type: 'GET',
+                        data: { collegeId: collegeId },
+                        success: function (data) {
+                            $.each(data, function (index, department) {
+                                departmentDropdown.append(
+                                    $('<option></option>').val(department.id).html(department.name)
+                                );
+                            });
+                        },
+                        error: function () {
+                            alert('Error loading departments');
+                        }
+                    });
+                }
+            });
+
+            $('#DepartmentId').change(function () {
+                var departmentId = $(this).val();
+                var programmeDropdown = $('#ProgrammeId');
+                programmeDropdown.empty();
+                programmeDropdown.append('<option disabled selected>-- Select Program --</option>');
+
+                if (departmentId) {
+                    $.ajax({
+                        url: '@Url.Action("GetProgrammeByDepartment", "Students")',
+                        type: 'GET',
+                        data: { departmentId: departmentId },
+                        success: function (data) {
+                            $.each(data, function (index, programme) {
+                                programmeDropdown.append(
+                                    $('<option></option>').val(programme.id).html(programme.name)
+                                );
+                            });
+                        },
+                        error: function () {
+                            alert('Error loading programmes');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

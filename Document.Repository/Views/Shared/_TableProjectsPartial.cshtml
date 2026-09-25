@@ -1,0 +1,90 @@
+﻿@model Document.Repository.Controllers.HomeViewModel
+
+<div class="container-fluid mt-4">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-1 text-gray-800">Browse Collections</h1>
+    <p class="mb-4">
+        Your gateway to academic theses, journals, and digital resources. With advanced search tools and persistent identifiers, we ensure seamless access, integrity, and support for the FWUCL community's research and learning.
+        <a target="_blank" href="https://datatables.net">Official documentation</a>.
+    </p>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h6 class="m-0 font-weight-bold text-primary">Repository Items</h6>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search items...">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered"
+                       id="dataTable"
+                       width="100%"
+                       cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Title</th>
+                            <th>Abstract</th>
+                            <th>Submitted Date</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var project in Model.TableProjects)
+                        {
+                            <tr>
+                                <td>@project.Student?.Name</td>
+                                <td>@project.Title</td>
+                                <td>@(project.Abstract?.Length > 100 ? project.Abstract.Substring(0, 100) + "..." : project.Abstract)</td>
+                                <td>@project.CreatedDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (project.Tags != null && project.Tags.Any())
+                                    {
+                                        @string.Join(", ", project.Tags.Select(t => t.Name))
+                                    }
+                                    else
+                                    {
+                                        <span>No Tags</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<!-- Pagination for the table -->
+<nav aria-label="Table pagination example">
+    <ul class="pagination justify-content-center mt-4">
+        <li class="page-item @(ViewBag.TableCurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link table-pagination" href="#" data-page="@ViewBag.TableCurrentPage - 1" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        @for (int i = 1; i <= ViewBag.TableTotalPages; i++)
+        {
+            <li class="page-item @(ViewBag.TableCurrentPage == i ? "active" : "")">
+                <a class="page-link table-pagination" href="#" data-page="@i">@i</a>
+            </li>
+        }
+        <li class="page-item @(ViewBag.TableCurrentPage == ViewBag.TableTotalPages ? "disabled" : "")">
+            <a class="page-link table-pagination" href="#" data-page="@ViewBag.TableCurrentPage + 1" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</div>

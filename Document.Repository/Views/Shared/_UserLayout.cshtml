@@ -1,0 +1,408 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="~/images/favicon.jpg" type="image/x-icon" />
+    <title>User Dashboard - Farwestern University Central E-library</title>
+    <link rel="stylesheet" href="~/css/user-layout.css" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+        /* Desktop Toggle Button */
+
+        @@media (min-width: 769px) {
+        .desktop-toggle{
+        display: block;
+        }
+
+        }
+
+        @@media (max-width: 768px) {
+        .mobile-header
+
+        {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
+
+        .main-content {
+        margin-left: 0;
+        padding-top: 70px;
+        width: 100%;
+        }
+
+        .sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar.show {
+        margin-left: 0;
+        }
+
+        .stats-card {
+        margin-bottom: 1rem;
+        }
+
+        .table-responsive {
+        margin-bottom: 1rem;
+        }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="btn btn-link text-white " id="sidebarToggle">
+            <i class="fas fa-bars mr-2"></i>
+        </button>
+        <div class="logo-container">
+            <img src="~/images/favicon.jpg" alt="Fwu central campus">
+            <span class="fs-5">FWU Digital Repository</span>
+        </div>
+        <div class="header-icons">
+            <a asp-controller="Home" asp-action="Index" class="login-icon">
+                <i class="fas fa-sign-in-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="container-fluid">
+        <div id="space-id">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="d-flex flex-column">
+                    <div class="pt-3">
+                        <div class="sidebar-brand-icon d-flex align-items-center justify-content-center text-white fs-6">
+                            <img src="~/images/favicon.jpg"
+                            alt="Fwu central campus"
+                            class="rounded me-2 ms-3"
+                            style="width: 45px; height: 45px;" />
+                            <span class="fw-bold"><span>सुदूरपश्चिम विश्वविद्यालय</span> <br>Central E-Library</span>
+                        </div>
+                    </div>
+                    <hr class="text-light">
+                    <ul class="nav flex-column" id="accordionSidebar">
+                        <!-- Dashboard -->
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-controller="User" asp-action="Index">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+
+                        <!-- College Section -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Colleges</span>
+                                </a>
+                                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                        {
+                                            <a class="collapse-item text-dark" asp-controller="Colleges" asp-action="Index">College List</a>
+                                        }
+                                        <a class="collapse-item text-dark" asp-controller="Colleges" asp-action="Create">Add College</a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                        {
+                            <!-- Department Section -->
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Department</span>
+                                </a>
+                                <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item text-dark" asp-controller="Departments" asp-action="Index">Department List</a>
+                                        <a class="collapse-item text-dark" asp-controller="Departments" asp-action="Create">Add Department</a>
+
+                                    </div>
+                                </div>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                        {
+                            <!-- Program Section -->
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Program</span>
+                                </a>
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item text-dark" asp-controller="Programmes" asp-action="Index">Program List</a>
+                                        <a class="collapse-item text-dark" asp-controller="Programmes" asp-action="Create">Add Program</a>
+
+                                    </div>
+                                </div>
+                            </li>
+                        }
+
+
+                        <!-- Project Section -->
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Project</span>
+                            </a>
+                            <div id="collapseFour" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                <div class="bg-white py-2 collapse-inner rounded">
+                                    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin")){
+                                        <a class="collapse-item text-dark" asp-controller="Projects" asp-action="Index">Project List</a>
+                                    }
+                                    <a class="collapse-item text-dark" asp-controller="Projects" asp-action="Create">Add Project</a>
+
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Student Section -->
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Student</span>
+                            </a>
+                            <div id="collapseFive" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                <div class="bg-white py-2 collapse-inner rounded">
+
+                                    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                                    {
+                                        <a class="collapse-item text-dark" asp-controller="Students" asp-action="Index">Student List</a>
+                                    }
+                                    <a class="collapse-item text-dark" asp-controller="Students" asp-action="Create">Add Student</a>
+
+                                </div>
+                            </div>
+                        </li>
+
+
+
+                        <!-- Tag Category Section -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Tag Category</span>
+                                </a>
+                                <div id="collapseSix" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item text-dark" asp-controller="TagCategories" asp-action="Index">Tag Category List</a>
+                                        <a class="collapse-item text-dark" asp-controller="TagCategories" asp-action="Create">Add Tag Category</a>
+
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                        <!-- Tag  Section -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") || User.IsInRole("CollegeAdmin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="true" aria-controls="collapseSeven">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Tag </span>
+                                </a>
+                                <div id="collapseSeven" class="collapse" aria-labelledby="headingOne" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item text-dark" asp-controller="Tags" asp-action="Index">Tag  List</a>
+                                        <a class="collapse-item text-dark" asp-controller="Tags" asp-action="Create">Add Tag </a>
+
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                        <!-- Admin Section -->
+                        @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin") )
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>Admin</span>
+                                </a>
+                                <div id="collapseAdmin" class="collapse" aria-labelledby="headingAdmin" data-bs-parent="#accordionSidebar">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                        <a class="collapse-item text-dark" asp-controller="roles" asp-action="Index">Role Management</a>
+                                        <a class="collapse-item text-dark" asp-controller="Notices" asp-action="Index">Notice Upload</a>
+                                        <a class="collapse-item text-dark" asp-controller="SliderImages" asp-action="Index">SliderImage Upload</a>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- Main Content -->
+            <div class="main-content" id="mainContent">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="header-container">
+                        <button class="desktop-toggle" id="desktopToggle">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="fs-4 fs-md-3 mb-0 d-none d-md-block">Welcome to Farwestern University Digital Repository</h2>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="dropdown d-none d-md-block">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> @User.Identity?.Name
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="User" asp-action="Profile"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="User" asp-action="Settings"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a class="dropdown-item" asp-controller="Home" asp-action="Index"><i class="fas fa-sign-out-alt"></i> Exit </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                @RenderBody()
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <partial name="_Footer" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const desktopToggle = document.getElementById('desktopToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const footer = document.querySelector('.footer');
+
+            function updateLayout() {
+                if (window.innerWidth <= 768) {
+                    // Mobile view
+                    footer.style.marginLeft = '0';
+                    footer.style.width = '100%';
+                } else {
+                    // Desktop view
+                    if (sidebar.classList.contains('collapsed')) {
+                        footer.style.marginLeft = '0';
+                        footer.style.width = '100%';
+                        footer.classList.add('expanded');
+                    } else {
+                        footer.style.marginLeft = 'var(--sidebar-width)';
+                        footer.style.width = 'calc(100% - var(--sidebar-width))';
+                        footer.classList.remove('expanded');
+                    }
+                }
+            }
+
+            function toggleSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                    sidebarOverlay.classList.toggle('show');
+                    updateLayout();
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                    updateLayout();
+                    // Update toggle button icon
+                    const icon = desktopToggle.querySelector('i');
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            }
+
+            // Mobile toggle
+            sidebarToggle.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('show');
+                    sidebarOverlay.classList.toggle('show');
+                    updateLayout();
+                }
+            });
+
+            // Desktop toggle
+            desktopToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    updateLayout();
+                }
+            });
+
+            // Close sidebar when clicking a link on mobile
+            const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                        sidebarOverlay.classList.remove('show');
+                        updateLayout();
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    const icon = desktopToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+                updateLayout();
+            });
+
+            // Scroll to Top Functionality
+            const scrollToTopBtn = document.getElementById('scrollToTop');
+
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.classList.add('show');
+                } else {
+                    scrollToTopBtn.classList.remove('show');
+                }
+            });
+
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Initial layout update
+            updateLayout();
+        });
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html> 

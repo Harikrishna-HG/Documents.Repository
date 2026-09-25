@@ -1,0 +1,52 @@
+﻿@model Document.Repository.ViewModels.CollectionsViewModel;
+
+@{
+    ViewData["Title"] = "Collections - FWU Central E-Library";
+}
+
+<div class="container mt-4">
+    <h1 class="page-title">Collections</h1>
+
+    <!-- Tag Categories -->
+    <div class="list-group mb-4">
+        <h3>Tag Categories</h3>
+        @foreach (var category in Model.TagCategories)
+        {
+            <a href="#category-@category.Id" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                @category.Label
+            </a>
+            <div id="category-@category.Id" class="collapse">
+                <ul class="list-group mt-2">
+                    @foreach (var tag in category.Tags)
+                    {
+                        <li class="list-group-item">
+                            <a asp-action="Collections" asp-route-tagId="@tag.Id">@tag.Name</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    <!-- Projects -->
+    @if (Model.Projects != null && Model.Projects.Any())
+    {
+        <h3>Projects</h3>
+        <partial name="_ProjectsPartial" model="Model.Projects" />
+    }
+    else if (Model.SelectedTagId.HasValue)
+    {
+        <p class="text-muted">No projects found for the selected tag.</p>
+    }
+</div>
+
+<style>
+    .page-title {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+    }
+</style>

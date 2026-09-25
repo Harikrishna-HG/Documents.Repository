@@ -1,0 +1,55 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model Document.Repository.Models.Entities.TagCategory
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h3 class="text-center">Create a New Tag Category</h3>
+<hr />
+<div class="container mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-12">
+            <div class="p-4">
+                <form asp-action="Create">
+                    <div class="row g-3">
+
+                        <!-- Label -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Label" class="form-label fw-bolder">Category Label  <span style="color: red">*</span></label>
+                                <input asp-for="Label" class="form-control" placeholder="Enter category label..." />
+                                <span asp-validation-for="Label" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Description" class="form-label fw-bolder">Description</label>
+                                <input asp-for="Description" class="form-control" placeholder="Enter description..." />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Submit Button & Back to List Button -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

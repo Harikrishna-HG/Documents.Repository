@@ -1,0 +1,41 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model List<Document.Repository.ViewModels.UserListViewModel>
+
+<h3>All Users</h3>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">User Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Roles</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        @if (user.Roles.Any())
+                        {
+                            @string.Join(", ", user.Roles)
+                        }
+                        else
+                        {
+                            <span>None</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="AssignRole" asp-route-userId="@user.UserId" class="btn btn-sm btn-info">Change Role</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

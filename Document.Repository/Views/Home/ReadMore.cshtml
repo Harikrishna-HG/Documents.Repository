@@ -1,0 +1,326 @@
+﻿@model Document.Repository.Models.Entities.Project
+
+<style>
+    .project-details-container {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        padding: 2rem 0;
+        width: 100%;
+    }
+
+    .project-header {
+        background:  #072c82;
+        color: white;
+        padding: 2.5rem;
+        border-radius: 15px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .project-header h2 {
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .project-header p {
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2.5rem;
+        overflow: hidden;
+    }
+
+    .info-card-header {
+        background-color: #f8f9fa;
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .info-card-header h3 {
+            color: #072c82;
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+    .info-card-body {
+        padding: 2rem;
+    }
+
+    .info-section {
+        margin-bottom: 2rem;
+    }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+    .info-section-title {
+        color: #072c82;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .info-item {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+    .info-label {
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .info-value {
+        color: #212529;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .tag-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .tag-item {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .tag-item:hover {
+            background-color: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+    .document-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .document-item {
+        background-color: #f8f9fa;
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+
+        .document-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .document-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .document-link {
+        color: #072c82;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+    }
+
+        .document-link:hover {
+            color: #0d6efd;
+        }
+
+    .document-icon {
+        color: #dc3545;
+        margin-right: 0.75rem;
+        font-size: 1.2rem;
+    }
+
+    .download-btn {
+        background-color: #072c82;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+        .download-btn:hover {
+            background-color: #0d6efd;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .download-btn i {
+            margin-right: 0.5rem;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .project-header {
+            padding: 2rem 1.5rem;
+        }
+
+            .project-header h2 {
+                font-size: 1.8rem;
+            }
+
+        .info-card-body {
+            padding: 1.5rem;
+        }
+
+        .document-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .download-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .project-header {
+            padding: 1.5rem;
+        }
+
+            .project-header h2 {
+                font-size: 1.5rem;
+            }
+
+        .info-card-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .info-card-body {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="project-details-container">
+    <div class="container-fluid">
+        <div class="project-header">
+            <h2>@Model.Title</h2>
+            <p><i class="fas fa-user me-2"></i>@Model.Student?.Name</p>
+            <p><i class="fas fa-calendar me-2"></i>@Model.CreatedDate.ToString("MMMM dd, yyyy")</p>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-header">
+                <h3>Project Information</h3>
+            </div>
+            <div class="info-card-body">
+                <div class="info-section">
+                    <div class="info-section-title">Abstract</div>
+                    <div class="info-value">@Model.Abstract</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">Academic Information</div>
+                    <div class="info-item">
+                        <div class="info-label">Programme</div>
+                        <div class="info-value">@Model.Student?.Programme?.Name</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Department</div>
+                        <div class="info-value">@Model.Student?.Programme?.Department?.Name</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">College</div>
+                        <div class="info-value">@Model.Student?.Programme?.Department?.College?.Name</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-header">
+                <h3>Tags</h3>
+            </div>
+            <div class="info-card-body">
+                <ul class="tag-list">
+                    @if (Model.Tags != null && Model.Tags.Any())
+                    {
+                        @foreach (var tag in Model.Tags)
+                        {
+                            <li class="tag-item">@tag.Name</li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="tag-item">No Tags</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-header">
+                <h3>Documents</h3>
+            </div>
+            <div class="info-card-body">
+                <ul class="document-list">
+                    @if (Model.Documents != null && Model.Documents.Any())
+                    {
+                        @foreach (var document in Model.Documents)
+                        {
+                            <li class="document-item">
+                                <div>
+                                    <i class="fas fa-file-pdf document-icon"></i>
+                                    <a href="@Url.Content("~/" + document.FilePath)" class="document-link" target="_blank">
+                                        @document.FileName
+                                    </a>
+                                </div>
+                                <a href="@Url.Content("~/" + document.FilePath)" class="download-btn" download>
+                                    <i class="fas fa-download"></i>Download
+                                </a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="document-item">
+                            <span>No Documents Available</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

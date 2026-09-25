@@ -1,0 +1,107 @@
+﻿@{
+    Layout = "_UserLayout";
+}
+@model IEnumerable<Document.Repository.Models.Entities.Tag>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="d-flex justify-content-between align-items-center pt-4">
+    <h3 class="mb-0">
+        List of Tags
+    </h3>
+    <a asp-action="Create" class="btn btn-primary">Add New</a>
+</div>
+
+<hr />
+
+<div class="d-flex justify-content-center mx-1 mx-md-2">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="text-center">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TagCategory.Label)
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TagCategory.Label)
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-evenly">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-sm btn-warning me-2" data-bs-toggle="modal" data-bs-target="#detailsModal"
+                                        data-id="@item.Id" data-name="@item.Name" data-description="@item.Description"
+                                        data-category="@item.TagCategory.Label">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                                <form asp-action="Delete" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger me-2"
+                                            onclick="if(confirm('Are you sure you want to delete this tag?')) this.closest('form').submit();">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for Details -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="detailsModalLabel">Tag Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> <span id="tagName"></span></p>
+                <p><strong>Description:</strong> <span id="tagDescription"></span></p>
+                <p><strong>Category:</strong> <span id="tagCategory"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS to handle modal data population -->
+<script>
+    const detailsModal = document.getElementById('detailsModal');
+    detailsModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const name = button.getAttribute('data-name');
+        const description = button.getAttribute('data-description');
+        const category = button.getAttribute('data-category');
+
+        document.getElementById('tagName').textContent = name;
+        document.getElementById('tagDescription').textContent = description;
+        document.getElementById('tagCategory').textContent = category;
+    });
+</script>
+

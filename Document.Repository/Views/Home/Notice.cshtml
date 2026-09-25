@@ -1,0 +1,39 @@
+﻿@model List<Document.Repository.Models.Entities.Notice>
+@{
+    ViewData["Title"] = "Notices - FWU Central E-Library";
+}
+<div class="notice-body">
+<div class="notice-container">
+    <div class="header">
+        <h2 class="page-title">E-Library Notices</h2>
+        <p class="subtitle">Latest announcements and updates</p>
+    </div>
+    <div class="notices-list">
+
+    @if (Model != null)
+    {
+            @if (Model != null && Model.Any())
+            {
+                foreach (var notice in Model)
+                {
+                    <div class="notice-card mb-2">
+                        <h3 class="notice-title">@notice.Title</h3>
+                        <p class="notice-description">@notice.Description</p>
+                        <div class="notice-footer">
+                            <a href="@Url.Content("~/notice/" + System.IO.Path.GetFileName(@notice.FilePath))" target="_blank" class="download-btn" download>
+                                <i class="fas fa-download"></i> Download Notice
+                            </a>
+                            <span class="notice-date">@notice.Date.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                       
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No notices available.</p>
+            }
+            }
+</div>
+</div>
+</div>

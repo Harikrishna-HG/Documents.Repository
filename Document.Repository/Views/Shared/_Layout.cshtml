@@ -1,0 +1,368 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <meta name="description" content="@ViewData["Description"]">
+    <meta name="keywords" content="@ViewData["Keywords"]">
+    <meta name="author" content="@ViewData["Author"]">
+    <link rel="icon" href="~/images/favicon.jpg" type="image/x-icon" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/main-layout.css" />
+    <style>
+        /* Scroll to Top Button Styles */
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: #072c82;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+            .scroll-to-top:hover {
+                background-color: #0d6efd;
+                transform: translateY(-3px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .scroll-to-top.show {
+                display: flex;
+            }
+
+        @@media (max-width: 768px) {
+            .scroll-to-top
+
+        {
+            bottom: 80px;
+            right: 15px;
+        }
+
+        }
+
+
+        .project-card {
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .project-image {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .btn-group .btn {
+            padding: 0.375rem 0.75rem;
+        }
+
+        .project-abstract {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+         
+
+        .project-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+    </style>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg  py-3" style="background-color: #072c82; ">
+        <div class="container-fluid">
+            <img src="~/images/favicon.jpg" alt="" height="50" class="rounded me-3 ml-1">
+            <a class="navbar-brand fw-semibold text-white" asp-controller="Home" asp-action="Index">FWU Central E-Library</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon " style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                   
+                    <li class="nav-item">
+                        <a class="nav-link text-white text-center" asp-controller="Home" asp-action="Collections">Collections</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white text-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Browse
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item text-center" asp-controller="Home" asp-action="Notice">Notice</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        string dashboardText = "User Dashboard";
+
+                        if (User.IsInRole("Student"))
+                        {
+                            dashboardText = "Student Dashboard";
+                        }
+                        else if (User.IsInRole("CollegeAdmin"))
+                        {
+                            dashboardText = "CollegeAdmin Dashboard";
+                        }
+                        else if (User.IsInRole("Admin"))
+                        {
+                            dashboardText = "Admin Dashboard";
+                        }
+                        else if (User.IsInRole("SuperAdmin"))
+                        {
+                            dashboardText = "SuperAdmin Dashboard";
+                        }
+
+                        <li class="nav-item text-center">
+                            <a class="btn text-white fw-bold px-4 py-2" asp-controller="User" asp-action="Index" style="background-color: #072c82; border: 2px solid white; border-radius: 5px;">
+                                @dashboardText
+                            </a>
+                        </li>
+                    }
+
+
+                </ul>
+                <form class="d-flex" role="search">
+                    <button class="btn btn-outline-light me-2" type="button" id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button> 
+                    <partial name="_LoginPartial" />
+                </form>
+            </div>
+        </div>
+    </nav>
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="close-search" id="closeSearch">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="search-container">
+            <div class="search-input-group">
+                <input type="text" class="search-input" placeholder="Search projects by title, abstract, tags, and contributor's name" id="searchInput">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+           <div class="container-fluid">
+            <div id="searchResults" class="row" style="max-height: 80vh;  overflow-y: auto;"></div>
+            <!-- Project cards will be displayed here -->
+            </div>
+        </div>
+    </div>
+    <div>
+        @RenderBody()
+    </div>
+    <!-- Footer -->
+    <partial name="_Footer" />
+
+    <!-- Important Notice Modal -->
+    @if (ViewBag.Notice != null)
+    {
+        var notice = ViewBag.Notice as Document.Repository.Models.Entities.Notice;
+        var filePath = Url.Content($"~/{notice.FilePath}");
+        var fileExtension = System.IO.Path.GetExtension(notice.FilePath).ToLower();
+
+        <div class="modal fade" id="importantNoticeModal" tabindex="-1" aria-labelledby="importantNoticeLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header text-light" style="background-color: #072c82;">
+                        <h5 class="modal-title" id="importantNoticeLabel">📢 @notice.Title</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        @if (fileExtension == ".pdf")
+                        {
+                            <embed src="@filePath" type="application/pdf" width="100%" height="500px" />
+                        }
+                        else if (fileExtension == ".jpg" || fileExtension == ".jpeg" || fileExtension == ".png")
+                        {
+                            <img src="@filePath" alt="Notice Image" class="img-fluid mb-3" />
+                        }
+                        else
+                        {
+                            <p class="text-danger">Unsupported notice format.</p>
+                        }
+
+                      
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <!-- Download Button -->
+                        <div class="mt-3">
+                            <a href="@filePath" download class="btn text-light" style="background-color: #072c82;">
+                                <i class="bi bi-download me-1"></i> Download Notice
+                            </a>
+                        </div>
+                        <div>
+
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="~/js/logout.js"></script>
+
+        <script>
+            window.addEventListener('load', function () {
+                var hasNotice = @((ViewBag.Notice != null).ToString().ToLower());
+                if (hasNotice) {
+                    setTimeout(function () {
+                        var noticeModal = new bootstrap.Modal(document.getElementById('importantNoticeModal'));
+                        noticeModal.show();
+                    }, 3000); // Show modal after 3 seconds
+                }
+            });
+
+
+            // Search Functionality
+
+           document.addEventListener('DOMContentLoaded', function () {
+            const searchButton = document.getElementById('searchButton');
+            const searchOverlay = document.getElementById('searchOverlay');
+            const closeSearch = document.getElementById('closeSearch');
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            searchButton.addEventListener('click', function () {
+                searchOverlay.style.display = 'block';
+                searchInput.focus();
+                searchResults.innerHTML = '';
+            });
+
+            closeSearch.addEventListener('click', function () {
+                searchOverlay.style.display = 'none';
+                searchResults.innerHTML = '';
+                searchInput.value = '';
+            });
+
+            searchInput.addEventListener('input', function () {
+                const query = this.value.trim();
+                if (query.length < 1) {
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                  fetch(`/Home/Search?query=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Debugging
+            searchResults.innerHTML = data.length ? data.map(project => `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card project-card h-100">
+                        <img src="${project.thumbnail}" class="card-img-top project-image" alt="Project ${project.title}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="small text-success-emphasis">
+                                    <i class="fas fa-tags me-1"></i>
+                                    ${project.tags && project.tags.length ? project.tags.join(', ') : 'No Tags'}
+                                </span>
+                                <span class="small text-muted">
+                                    <i class="fas fa-calendar me-1"></i> ${project.date}
+                                </span>
+                            </div>
+                            <h5 class="card-title">${project.title}</h5>
+                            <div class="mb-2 text-body-secondary small">
+                                <i class="fas fa-user me-1"></i> ${project.contributor || 'Unknown'}
+                            </div>
+                            <p class="card-text project-abstract">
+                                ${project.abstract.length > 180 ? project.abstract.substring(0, 80) + '...' : project.abstract}
+                            </p>
+                            <div class="project-buttons">
+                                <div class="d-flex justify-content-between w-100">
+                                    <div>
+                                        <a class="btn btn-sm btn-primary" href="/Home/ReadMore/${project.id}">
+                                            <i class="fas fa-book-open me-1"></i>Read More
+                                        </a>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#pdfModal"
+                                                data-pdfpath="${project.viewUrl}">
+                                            <i class="fas fa-eye me-1"></i>View PDF
+                                        </button>
+                                        ${project.downloadUrl ? `
+                                        <a href="${project.downloadUrl}" class="btn btn-sm btn-outline-success" download>
+                                            <i class="fas fa-download me-1"></i>Download
+                                        </a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('') : '<p class="text-center text-muted">No results found.</p>';
+        });
+
+            });
+        });
+
+        </script>
+   <script>
+
+        // Scroll to Top Functionality
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+   </script>
+
+    @RenderSection("Scripts", required: false) 
+
+
+
+
+</body>
+</html>
+
